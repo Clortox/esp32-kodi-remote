@@ -1,6 +1,8 @@
 #pragma once
 
 #include "config.hpp"
+#include "esp_crt_bundle.h"
+#include "esp_err.h"
 #include "esp_http_client.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"
@@ -8,11 +10,11 @@
 #include "portmacro.h"
 #include "wifi/wifi.hpp"
 #include <array>
-#include <memory>
+#include <cstring>
 
 class HttpClient {
 public:
-  HttpClient &instance();
+  static HttpClient &instance();
   HttpClient(const HttpClient &) = delete;
   HttpClient &operator=(const HttpClient &) = delete;
 
@@ -27,20 +29,21 @@ public:
   };
 
   struct HttpResponse {
-    int response_code;
-    HttpError error;
+    std::array<char, kMaxHttpResponseBody> body = {0};
+    size_t size = 0;
+    int response_code = 0;
+    HttpError error = HttpError::REQUEST_OK;
     bool overflow = false;
     bool ok() const {
       return error == REQUEST_OK && 200 <= response_code &&
              response_code < 300 && !overflow;
     }
-    std::array<char, kMaxHttpResponseBody> body = {0};
   };
 
   struct HttpRequest {
     std::array<char, 256> url = {0};
-    HttpMethod method;
-    std::array<char, 2048> body;
+    HttpMethod method = HttpMethod::HTTP_METHOD_GET;
+    std::array<char, 1024> body;
   };
 
   struct HttpJob {
@@ -65,8 +68,8 @@ private:
   static constexpr int kDefaultTimeout = 5000; // ms
   static constexpr int kMaxRedirect =
       3; // max number of http redirects to follow
-  static constexpr int kMaxQueueSize = 10; // max jobs on the queue
-  static constexpr int kStackWords = 2000; // stack size in bytes
+  static constexpr int kMaxQueueSize = 10;      // max jobs on the queue
+  static constexpr int kStackBytes = 1024 * 16; // stack size in bytes
   static esp_err_t event_handler(esp_http_client_event *);
 
   StaticQueue_t queue_memory_;
@@ -75,7 +78,7 @@ private:
 
   static constexpr char kTaskName[] = "HttpClient";
   StaticTask_t task_memory_;
-  std::array<StackType_t, kStackWords> stack_;
+  std::array<StackType_t, kStackBytes> stack_;
   TaskHandle_t task_ = nullptr;
 
   esp_http_client_handle_t esp_http_client_;
