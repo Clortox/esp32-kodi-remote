@@ -1,0 +1,11 @@
+CompileFlags:
+  CompileCommandsDir: build.clang
+  Remove:
+    - -fno-shrink-wrap
+    - -fstrict-volatile-bitfields
+    - -fno-volatile-bitfields
+    - -fno-inline-functions-called-once
+    - -fno-inline-small-functions
+    - -fno-malloc-dce
+    - -fno-tree-switch-conversion
+    - -mlongcalls
