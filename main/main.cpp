@@ -11,9 +11,11 @@
 static inline constexpr char TAG[] = "main";
 
 void banner() {
+  ESP_LOGI(TAG, "=======================");
   ESP_LOGI(TAG, "Hello from ESP Remote");
-  ESP_LOGI(TAG, "Author: Tyler Perkins");
+  ESP_LOGI(TAG, "Author: Tyler Perkins (hello@clortox.com)");
   ESP_LOGI(TAG, "For use with Kodi and my specific sound system");
+  ESP_LOGI(TAG, "=======================");
 }
 
 extern "C" void app_main() {

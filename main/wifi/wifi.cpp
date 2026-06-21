@@ -17,6 +17,10 @@ Wifi &Wifi::instance() {
   return wifi_;
 };
 
+bool Wifi::is_connected() const {
+  return xEventGroupGetBits(wifi_event_group_) & kConnectedBit;
+}
+
 Wifi::Wifi() {
   ESP_LOGI(TAG, "Init wifi singleton");
 

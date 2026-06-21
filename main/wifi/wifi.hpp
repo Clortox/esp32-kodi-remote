@@ -18,6 +18,8 @@ public:
 
   esp_err_t start();
 
+  bool is_connected() const;
+
 private:
   Wifi();
 
